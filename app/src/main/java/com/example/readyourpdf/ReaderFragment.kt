@@ -104,18 +104,9 @@ class ReaderFragment : Fragment() {
         super.onSaveInstanceState(outState)
     }
 
-    /**
-     * Sets up a [PdfRenderer] and related resources.
-     */
     @Throws(IOException::class)
     private fun openRenderer(context: Context?, documentUri: Uri) {
         if (context == null) return
-
-        /**
-         * It may be tempting to use `use` here, but [PdfRenderer] expects to take ownership
-         * of the [FileDescriptor], and, if we did use `use`, it would be auto-closed at the
-         * end of the block, preventing us from rendering additional pages.
-         */
         val fileDescriptor = context.contentResolver.openFileDescriptor(documentUri, "r") ?: return
 
         // This is the PdfRenderer we use to render the PDF.
@@ -123,30 +114,12 @@ class ReaderFragment : Fragment() {
         currentPage = pdfRenderer.openPage(currentPageNumber)
     }
 
-    /**
-     * Closes the [PdfRenderer] and related resources.
-     *
-     * @throws IOException When the PDF file cannot be closed.
-     */
     @Throws(IOException::class)
     private fun closeRenderer() {
         currentPage.close()
         pdfRenderer.close()
     }
 
-    /**
-     * Shows the specified page of PDF to the screen.
-     *
-     * The way [PdfRenderer] works is that it allows for "opening" a page with the method
-     * [PdfRenderer.openPage], which takes a (0 based) page number to open. This returns
-     * a [PdfRenderer.Page] object, which represents the content of this page.
-     *
-     * There are two ways to render the content of a [PdfRenderer.Page].
-     * [PdfRenderer.Page.RENDER_MODE_FOR_PRINT] and [PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY].
-     * Since we're displaying the data on the screen of the device, we'll use the later.
-     *
-     * @param index The page index.
-     */
     private fun showPage(index: Int) {
         if (index < 0 || index >= pdfRenderer.pageCount) return
 
@@ -165,9 +138,3 @@ class ReaderFragment : Fragment() {
         activity?.title = getString(R.string.app_name_with_index, index + 1, pageCount)
     }
 }
-
-/**
- * Key string for saving the state of current page index.
- */
-
-

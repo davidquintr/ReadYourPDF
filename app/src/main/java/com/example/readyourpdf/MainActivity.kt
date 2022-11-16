@@ -20,9 +20,6 @@ import androidx.fragment.app.transaction
 
 const val DOCUMENT_FRAGMENT_TAG = "com.example.android.actionopendocument.tags.DOCUMENT_FRAGMENT"
 
-/**
- * Simple activity to host [ReaderFragment].
- */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var noDocumentView: ViewGroup
@@ -73,22 +70,6 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == OPEN_DOCUMENT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             resultData?.data?.also { documentUri ->
 
-                /**
-                 * Upon getting a document uri returned, we can use
-                 * [ContentResolver.takePersistableUriPermission] in order to persist the
-                 * permission across restarts.
-                 *
-                 * This may not be necessary for your app. If the permission is not
-                 * persisted, access to the uri is granted until the receiving Activity is
-                 * finished. You can extend the lifetime of the permission grant by passing
-                 * it along to another Android component. This is done by including the uri
-                 * in the data field or the ClipData object of the Intent used to launch that
-                 * component. Additionally, you need to add FLAG_GRANT_READ_URI_PERMISSION
-                 * and/or FLAG_GRANT_WRITE_URI_PERMISSION to the Intent.
-                 *
-                 * This app takes the persistable URI permission grant to demonstrate how, and
-                 * to allow us to reopen the last opened document when the app starts.
-                 */
                 contentResolver.takePersistableUriPermission(
                     documentUri,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -100,30 +81,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun openDocumentPicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            /**
-             * It's possible to limit the types of files by mime-type. Since this
-             * app displays pages from a PDF file, we'll specify `application/pdf`
-             * in `type`.
-             * See [Intent.setType] for more details.
-             */
-            type = "application/pdf"
-
-            /**
-             * Because we'll want to use [ContentResolver.openFileDescriptor] to read
-             * the data of whatever file is picked, we set [Intent.CATEGORY_OPENABLE]
-             * to ensure this will succeed.
-             */
             addCategory(Intent.CATEGORY_OPENABLE)
         }
         startActivityForResult(intent, OPEN_DOCUMENT_REQUEST_CODE)
     }
 
     private fun openDocument(documentUri: Uri) {
-        /**
-         * Save the document to [SharedPreferences]. We're able to do this, and use the
-         * uri saved indefinitely, because we called [ContentResolver.takePersistableUriPermission]
-         * up in [onActivityResult].
-         */
         getSharedPreferences(TAG, MODE_PRIVATE).edit {
             putString(LAST_OPENED_URI_KEY, documentUri.toString())
         }
